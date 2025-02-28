@@ -182,18 +182,18 @@ fun AnalysisScreen(
         }
     }
 
-    Scaffold(
+    Scaffold  (
         //bottomBar = {
          //   BottomNavigationBar(navController = rememberNavController(), modifier = Modifier)
       //  }
-    ) { _ ->
+    ){ _ ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.White)
         ) {
             // Header
-            Box(
+         /*   Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(primaryGradient)
@@ -205,7 +205,7 @@ fun AnalysisScreen(
                     color = Color.White,
                     fontWeight = FontWeight.Bold
                 )
-            }
+            }*/
 
             // Filter section
             FilterRow(
@@ -235,6 +235,10 @@ fun AnalysisScreen(
                     selectedTags = emptySet()
                 }
             )
+
+
+
+            TotalCountsAndPaymentsSection(viewModel = viewModel)
 
             // Payments list
             if (payments.isEmpty()) {
@@ -284,7 +288,67 @@ private fun ActiveFiltersInfo(
         }
     }
 }
+@Composable
+fun TotalCountsAndPaymentsSection(modifier: Modifier = Modifier, viewModel: AnalysisViewModel) {
+    val totalPayments by viewModel.totalCount.collectAsState(0)
+    val totalSum by viewModel.totalSum.collectAsState(0)
 
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(spacingMedium),
+        horizontalArrangement = Arrangement.SpaceBetween  // Distribute cards evenly
+    ) {
+        Card(
+            modifier = Modifier.weight(1f).padding(end = spacingSmall)  // Add weight and padding
+        ) {
+            Column(
+                modifier = Modifier.padding(spacingMedium),
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = "Total Payments",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = textSecondary
+                )
+                Spacer(modifier = Modifier.height(spacingSmall))
+                Text(
+                    text = "₹${totalPayments.toInt().formatWithCommas()}",  // Format the number
+                    style = MaterialTheme.typography.titleMedium,
+                    color = textPrimary,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+
+        Card(
+            modifier = Modifier.weight(1f).padding(start = spacingSmall)  // Add weight and padding
+        ) {
+            Column(
+                modifier = Modifier.padding(spacingMedium),
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = "Total Sum",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = textSecondary
+                )
+                Spacer(modifier = Modifier.height(spacingSmall))
+                Text(
+                    text = "₹${totalSum.formatWithCommas()}",  // Format the number
+                    style = MaterialTheme.typography.titleMedium,
+                    color = textPrimary,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+    }
+}
+
+
+fun Int.formatWithCommas(): String {
+    return "%,d".format(this)
+}
 @Composable
 private fun EmptyState() {
     Box(

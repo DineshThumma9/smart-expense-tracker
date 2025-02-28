@@ -1,3 +1,4 @@
+/*
 package com.example.something.navigation
 
 import androidx.compose.runtime.Composable
@@ -67,4 +68,4 @@ fun NavGraph(navController: NavHostController,paymentviewModel: PaymentViewModel
             )
         }
     }
-}
+}*/

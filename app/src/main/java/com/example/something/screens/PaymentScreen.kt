@@ -102,9 +102,9 @@ fun PaymentScreen(
                 }
             }
         },
-        bottomBar = {
-            BottomNavigationBar(navController = rememberNavController())
-        },
+//        bottomBar = {
+//            BottomNavigationBar(navController = rememberNavController())
+//        },
         containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         Column(

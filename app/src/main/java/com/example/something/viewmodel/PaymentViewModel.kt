@@ -111,4 +111,10 @@ class PaymentViewModel(
         val tag = tagDao.getTagByName(tagName) ?: return flowOf(emptyList())
         return paymentWithTagsDao.getAllPaymentsWithTagsByTag(tag.tagId)
     }
+
+    // In PaymentViewModel.kt
+    fun updateCurrPayment(newAmount: String) {
+        _currPayment.value = newAmount.toDouble()
+        // Optionally save this to your database or persistent storage
+    }
 }

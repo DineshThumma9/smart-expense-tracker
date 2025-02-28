@@ -1,11 +1,15 @@
 package com.example.something.screens
 
+import android.os.Handler
+import android.os.Looper
 import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Add
@@ -22,12 +26,15 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.something.R
@@ -133,7 +140,7 @@ fun GreetingSection() {
         )
     }
 }
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EnhancedCardSection(viewModel: PaymentViewModel) {
 
@@ -158,12 +165,14 @@ fun EnhancedCardSection(viewModel: PaymentViewModel) {
                 fontSize = 16.sp,
                 color = Color.Gray
             )
-            Text(
-                "₹${currPayment}",
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black,
-                modifier = Modifier
+
+            // Replace the direct Text with AmountDisplay component
+            AmountDisplay(
+                amount = currPayment.toInt(),
+                onAmountChanged = { newAmount ->
+                    // Update the viewModel with the new amount
+                    viewModel.updateCurrPayment(newAmount.toString())
+                }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -226,6 +235,7 @@ fun EnhancedCardSection(viewModel: PaymentViewModel) {
     }
 }
 
+
 //@Composable
 //fun QuickActionSection(navController: NavController) {
 //    Row(
@@ -257,6 +267,99 @@ fun EnhancedCardSection(viewModel: PaymentViewModel) {
 //        )
 //    }
 //}
+
+
+@Composable
+fun AmountDisplay(
+    amount: Int,
+    onAmountChanged: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    // State to track click count and timing
+    var clickCount by remember { mutableStateOf(0) }
+    var showDialog by remember { mutableStateOf(false) }
+    var lastClickTime by remember { mutableStateOf(0L) }
+
+    // Dialog state
+    var inputAmount by remember { mutableStateOf(amount.toString()) }
+
+    // Dialog component
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Set Amount") },
+            text = {
+                TextField(
+                    value = inputAmount,
+                    onValueChange = {
+                        // Only allow numeric input
+                        if (it.isEmpty() || it.all { char -> char.isDigit() }) {
+                            inputAmount = it
+                        }
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    label = { Text("Amount") },
+                    singleLine = true
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        inputAmount.toIntOrNull()?.let { newAmount ->
+                            onAmountChanged(newAmount)
+                        }
+                        showDialog = false
+                    }
+                ) {
+                    Text("Save")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showDialog = false }
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
+    // Text with double-click detection
+    Text(
+        text = "₹${amount.toInt()}",
+        style = MaterialTheme.typography.titleLarge,
+        fontWeight = FontWeight.Bold,
+        modifier = modifier
+            .clickable {
+                val currentTime = System.currentTimeMillis()
+
+                // Check if this is a double click (within 300ms)
+                if (currentTime - lastClickTime < 300) {
+                    clickCount++
+                    if (clickCount >= 2) {
+                        // Double click detected, show dialog
+                        inputAmount = amount.toString()
+                        showDialog = true
+                        clickCount = 0
+                    }
+                } else {
+                    clickCount = 1
+                }
+
+                lastClickTime = currentTime
+
+                // Reset click count after a delay if no second click
+                Handler(Looper.getMainLooper()).postDelayed({
+                    if (currentTime == lastClickTime) {
+                        clickCount = 0
+                    }
+                }, 300)
+            }
+            .padding(1.dp)
+    )
+}
+
+
 
 @Composable
 fun QuickActionButton(
