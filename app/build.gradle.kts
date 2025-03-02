@@ -1,11 +1,9 @@
-
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("com.google.devtools.ksp")
-    id("com.google.gms.google-services") // Firebase Plugin
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -20,18 +18,28 @@ android {
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled = true
+        buildConfigField("String", "MONGODB_URI", "\"${project.findProperty("MONGODB_URI") ?: ""}\"")
     }
 
     packaging {
-        resources {
-            excludes += listOf(
+        resources.excludes.addAll(
+            listOf(
                 "META-INF/INDEX.LIST",
                 "META-INF/io.netty.versions.properties",
                 "META-INF/*.kotlin_module",
                 "META-INF/native-image/org.mongodb/bson/native-image.properties",
-                "META-INF/native-image/**"
+                "META-INF/native-image/**",
+                "META-INF/DEPENDENCIES",
+                "META-INF/LICENSE",
+                "META-INF/LICENSE.txt",
+                "META-INF/license.txt",
+                "META-INF/NOTICE",
+                "META-INF/NOTICE.txt",
+                "META-INF/notice.txt",
+                "META-INF/ASL2.0",
+                "META-INF/services/javax.annotation.processing.Processor"
             )
-        }
+        )
     }
 
     buildTypes {
@@ -60,14 +68,10 @@ android {
 
     buildFeatures {
         compose = true
-    }
-
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile>().configureEach {
-        jvmTargetValidationMode.set(org.jetbrains.kotlin.gradle.dsl.jvm.JvmTargetValidationMode.WARNING)
+        buildConfig = true
     }
 }
 
-// Exclude the desugaring library from the androidTest configuration
 configurations {
     androidTestImplementation {
         exclude(group = "com.android.tools", module = "desugar_jdk_libs")
@@ -88,42 +92,22 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.storage)
 
-    // ✅ Testing Dependencies
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
+    // ✅ MongoDB Driver (Excluding Unnecessary Modules)
+    implementation(libs.mongodb.driver.kotlin.coroutine.v530)
 
-    // ✅ Material & Fonts
-    implementation(libs.androidx.material.icons.extended)
-    implementation(libs.androidx.ui.text.google.fonts)
 
-    // ✅ Ktor (Use the latest stable 2.x version)
-    implementation("io.ktor:ktor-client-core:2.3.6")
-    implementation("io.ktor:ktor-client-okhttp:2.3.6")
-    implementation("io.ktor:ktor-client-serialization:2.3.6")
-    implementation("io.ktor:ktor-client-logging:2.3.6")
+    // ✅ BSON Library
+    implementation(libs.bson.v4101)
+
+    // ✅ Ktor Client
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.okhttp)
+    implementation(libs.ktor.client.serialization)
+    implementation(libs.ktor.client.logging)
 
     // ✅ Kotlin Coroutines
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.1")
-
-    // ✅ MongoDB Kotlin Coroutine Driver
-    implementation(libs.mongodb.driver.kotlin.coroutine.v520)
-    implementation("org.mongodb:mongodb-driver-sync:4.11.1") {
-        exclude(group = "org.mongodb", module = "mongodb-driver-core")
-        exclude(group = "org.mongodb", module = "bson")
-        exclude(group = "org.mongodb", module = "mongodb-driver-legacy")
-    }
-
-    // ✅ BSON (Fix BSON Codec Issue)
-    implementation("org.mongodb:bson:4.10.1")
-
-    // ✅ Coroutines Reactive (For `asFlow()`)
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.10.1")
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android)
 
     // ✅ Room Database
     implementation(libs.androidx.room.runtime)
@@ -133,8 +117,16 @@ dependencies {
     // ✅ Core Library Desugaring for Java 11+
     coreLibraryDesugaring(libs.desugar.jdk.libs)
 
+
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.10.1")
+
+
+    // ✅ Material & Fonts
+    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.androidx.ui.text.google.fonts)
+
     // 🔥 **Firebase Dependencies**
-    implementation(platform("com.google.firebase:firebase-bom:33.9.0")) // Firebase BOM for auto-versioning
+    implementation(platform("com.google.firebase:firebase-bom:33.10.0")) // Firebase BOM for auto-versioning
     implementation("com.google.firebase:firebase-auth-ktx")           // Firebase Authentication
     implementation("com.google.firebase:firebase-firestore-ktx")      // Firestore Database
     implementation("com.google.firebase:firebase-messaging-ktx")      // Firebase Cloud Messaging

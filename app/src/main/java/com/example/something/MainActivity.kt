@@ -8,8 +8,8 @@ import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.Crossfade
-
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -29,18 +29,32 @@ import com.example.something.viewmodel.PaymentViewModel
 
 class MainActivity : ComponentActivity() {
 
+    // Register an ActivityResultLauncher for overlay permission
+    private val overlayPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        // Optionally, handle the result. For example, check if overlay permission was granted:
+        if (!Settings.canDrawOverlays(this)) {
+            // You may notify the user or take other action if permission is still not granted.
+        }
+    }
+
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Request overlay permission if necessary
+        // Request overlay permission if necessary using the new API
         if (!Settings.canDrawOverlays(this)) {
-            val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
-            startActivityForResult(intent, 101)
+            val intent = Intent(
+                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                Uri.parse("package:$packageName")
+            )
+            overlayPermissionLauncher.launch(intent)
         }
 
         enableEdgeToEdge()
 
+        // Initialize your database and DAOs
         val database = applicationContext.getDatabase()
         val paymentMongoDao = PaymentMongoDao()
 
@@ -79,7 +93,6 @@ class MainActivity : ComponentActivity() {
                                 paymentViewModel = paymentViewModel,
                                 analysisViewModel = analysisViewModel,
                                 authViewModel = authViewModel
-
                             )
                         }
                     } else {

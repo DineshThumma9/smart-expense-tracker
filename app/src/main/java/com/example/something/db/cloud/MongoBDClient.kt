@@ -1,22 +1,55 @@
 package com.example.something.db.cloud
 
-import android.annotation.SuppressLint
 import android.util.Log
+import com.mongodb.ConnectionString
+import com.mongodb.MongoClientSettings
 import com.mongodb.kotlin.client.coroutine.MongoClient
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
-
+import kotlinx.coroutines.*
+import java.util.concurrent.TimeUnit
 
 object MongoDBClient {
-    @SuppressLint("AuthLeak")
-//    private const val  CONNECTION_STRING = "mongodb://localhost:27017"
-  private const val CONNECTION_STRING = "mongodb://dineshthumma15:ZWOaKSpu7pcFlFWr@cluster0-shard-00-00.example.mongodb.net:27017,cluster0-shard-00-01.example.mongodb.net:27017,cluster0-shard-00-02.example.mongodb.net:27017/?retryWrites=true&w=majority&appName=duct"
-
+    private const val TAG = "MongoDBClient"
+    private const val MONGODB_URI = "mongodb://dineshthumma15:rLZBc6kYij2wwCBA@duct.lsgqe.mongodb.net/paymentdb?retryWrites=false&w=majority"
     private const val DATABASE_NAME = "paymentdb"
 
-    val database: MongoDatabase = run {
-        val client = MongoClient.create(CONNECTION_STRING)
-        Log.d("MongoDBClient", "Connected to MongoDB")
-        client.getDatabase(DATABASE_NAME)
+    private lateinit var client: MongoClient
+    lateinit var database: MongoDatabase
 
+    init {
+        try {
+            Log.d(TAG, "Initializing MongoDB connection")
+
+            val settings = MongoClientSettings.builder()
+                .applyConnectionString(ConnectionString(MONGODB_URI))
+                .applyToSslSettings { it.enabled(true) }
+                .applyToSocketSettings {
+                    it.connectTimeout(60, TimeUnit.SECONDS) // Increased timeout
+                    it.readTimeout(60, TimeUnit.SECONDS)
+                }
+                .applyToClusterSettings {
+                    it.serverSelectionTimeout(60, TimeUnit.SECONDS) // Increased server selection timeout
+                }
+                .build()
+
+            client = MongoClient.create(settings)
+            database = client.getDatabase(DATABASE_NAME)
+            Log.d(TAG, "MongoDB connection established")
+        } catch (e: Exception) {
+            Log.e(TAG, "MongoDB connection failed", e)
+        }
+    }
+
+    /** Test MongoDB connection */
+    suspend fun testConnection() {
+        withContext(Dispatchers.IO) {
+            try {
+                database.listCollectionNames().collect {
+                    Log.d(TAG, "Connected to MongoDB: Collection found - $it")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "MongoDB Test Connection Failed", e)
+            }
+        }
     }
 }

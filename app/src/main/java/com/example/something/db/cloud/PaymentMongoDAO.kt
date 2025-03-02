@@ -11,7 +11,7 @@ import java.util.Date
 
 class PaymentMongoDao {
     private val paymentCollection: MongoCollection<PaymentMongo> =
-        MongoDBClient.database.getCollection("payments")
+        MongoDBClient.database?.getCollection("payments") ?: throw Exception("Payments collection not found")
 
     suspend fun insertOne(payment: PaymentMongo) {
         paymentCollection.insertOne(payment)
@@ -90,19 +90,27 @@ class PaymentMongoDao {
 
     suspend fun paymentsDateAbove(from: Date): Flow<List<PaymentMongo>> {
         val query = Document("date", Document("\$gte", from))
+        Log.d("PaymentMongoDao", "Query: $query")
+        Log.d("PaymentMongoDao","Fetching payments from MongoDB")
         return flowOf(paymentCollection.find(query).toList())
     }
 
     suspend fun paymentsByAUser(user: String): Flow<List<PaymentMongo>> {
+        Log.d("PaymentMongoDao", "Query: $user")
+        Log.d("PaymentMongoDao","Fetching payments from MongoDB")
         return flowOf(paymentCollection.find(Document("sender", user)).toList())
     }
 
     suspend fun paymentsByAmount(min: Int, max: Int): Flow<List<PaymentMongo>> {
         val query = Document("amount", Document("\$gte", min).append("\$lte", max))
+        Log.d("PaymentMongoDao", "Query: $query")
+        Log.d("PaymentMongoDao","Fetching payments from MongoDB")
         return flowOf(paymentCollection.find(query).toList())
     }
 
     suspend fun paymentsByType(type: String): Flow<List<PaymentMongo>> {
+        Log.d("PaymentMongoDao", "Query: $type")
+        Log.d("PaymentMongoDao","Fetching payments from MongoDB")
         return flowOf(paymentCollection.find(Document("type", type)).toList())
     }
 

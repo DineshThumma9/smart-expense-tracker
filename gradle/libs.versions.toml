@@ -1,12 +1,22 @@
 [versions]
 agp = "8.8.2"
+bson = "4.10.1"
+bsonKotlinx = "5.3.0"
 desugar_jdk_libs = "2.1.4"
+dnsjava = "3.5.2"
+jbossJndiApi_xX_spec = "2.0.0.Final"
 kotlin = "2.0.21"
 coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 kotlinxCoroutinesAndroid = "1.10.1"
+kotlinxCoroutinesCore = "1.10.1"
+kotlinxCoroutinesReactive = "1.10.1"
+ktorClientCore = "2.3.6"
+ktorClientLogging = "2.3.6"
+ktorClientOkhttp = "2.3.6"
+ktorClientSerialization = "2.3.6"
 ktorServerCore = "3.0.3"
 ktorServerNetty = "3.0.3"
 lifecycleRuntimeKtx = "2.8.7"
@@ -14,14 +24,18 @@ activityCompose = "1.10.0"
 composeBom = "2025.01.00"
 material3 = "1.3.1"
 materialIconsExtended = "1.7.8"
+mongodbDriverAndroid = "4.10.1"
 mongodbDriverKotlinCoroutine = "4.10.1"
 mongodbDriverKotlinCoroutineVersion = "5.2.0"
 mongodbDriverSync = "4.11.1"
+mongodbDriverSyncVersion = "4.9.0"
+mongodbMongodbDriverKotlinCoroutine = "5.3.0"
 multidex = "2.0.1"
 roomRuntime = "2.6.1"
 navigationCompose = "2.8.5"
 uiTextGoogleFonts = "1.7.8"
 storage = "1.5.0"
+transportApi = "3.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -35,7 +49,12 @@ androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "
 androidx-room-rxjava2 = { module = "androidx.room:room-rxjava2", version.ref = "roomRuntime" }
 androidx-room-rxjava3 = { module = "androidx.room:room-rxjava3", version.ref = "roomRuntime" }
 androidx-ui-text-google-fonts = { module = "androidx.compose.ui:ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
+bson = { module = "org.mongodb:bson", version.ref = "bsonKotlinx" }
+bson-kotlinx = { module = "org.mongodb:bson-kotlinx", version.ref = "bsonKotlinx" }
+bson-v4101 = { module = "org.mongodb:bson", version.ref = "bson" }
 desugar_jdk_libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar_jdk_libs" }
+dnsjava = { module = "dnsjava:dnsjava", version.ref = "dnsjava" }
+jboss-jndi-api_x-x_spec = { module = "org.jboss.spec.javax.naming:jboss-jndi-api_1.2_spec", version.ref = "jbossJndiApi_xX_spec" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -50,14 +69,24 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
+kotlinx-coroutines-reactive = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactive", version.ref = "kotlinxCoroutinesReactive" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorClientCore" }
+ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktorClientLogging" }
+ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktorClientOkhttp" }
+ktor-client-serialization = { module = "io.ktor:ktor-client-serialization", version.ref = "ktorClientSerialization" }
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktorServerCore" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktorServerNetty" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
+mongodb-driver-android = { module = "org.mongodb:mongodb-driver-android", version.ref = "mongodbDriverAndroid" }
 mongodb-driver-kotlin-coroutine = { module = "org.mongodb:mongodb-driver-kotlin-coroutine", version.ref = "mongodbDriverKotlinCoroutine" }
 mongodb-driver-kotlin-coroutine-v520 = { module = "org.mongodb:mongodb-driver-kotlin-coroutine", version.ref = "mongodbDriverKotlinCoroutineVersion" }
+mongodb-driver-kotlin-coroutine-v530 = { module = "org.mongodb:mongodb-driver-kotlin-coroutine", version.ref = "mongodbMongodbDriverKotlinCoroutine" }
 mongodb-driver-sync = { module = "org.mongodb:mongodb-driver-sync", version.ref = "mongodbDriverSync" }
 androidx-storage = { group = "androidx.test.services", name = "storage", version.ref = "storage" }
+mongodb-driver-sync-v490 = { module = "org.mongodb:mongodb-driver-sync", version.ref = "mongodbDriverSyncVersion" }
+transport-api = { group = "com.google.android.datatransport", name = "transport-api", version.ref = "transportApi" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

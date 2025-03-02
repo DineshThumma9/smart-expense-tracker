@@ -1,5 +1,6 @@
 package com.example.something.screens
 
+import android.util.Log
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -48,6 +49,7 @@ class AnalysisViewModel(
 
     fun getPaymentAbove(amount: Int) {
         viewModelScope.launch {
+            Log.d("Analysis" , "Calling method")
             paymentMongoDao.getPaymentAbove(amount).collect { list ->
                 _payments.value = list
             }
@@ -118,6 +120,7 @@ class AnalysisViewModel(
 
     fun paymentsByAmount(min: Int, max: Int) {
         viewModelScope.launch {
+            Log.d("Analysis" , "Calling method")
             paymentMongoDao.paymentsByAmount(min, max).collect { list ->
                 _payments.value = list
             }
