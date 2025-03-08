@@ -1,18 +1,13 @@
 package com.example.something.entity
 
-import org.bson.codecs.pojo.annotations.BsonId
-import org.bson.types.ObjectId
-import java.time.Instant
+import com.google.firebase.firestore.ServerTimestamp
+import java.util.Date
 
 data class PaymentMongo(
-    @BsonId
-    val id: ObjectId? = null, // MongoDB _id (ObjectId)
-
+    val id: String? = null, // Firestore document ID; assign a unique string when creating a new document.
     val sender: String = "",
-
     val amount: Double = 0.0,
-
-    val date: Instant = Instant.now(),
-
-    val tags: List<String> = emptyList() // Store tag names directly
+    @ServerTimestamp
+    val date: Date? = null, // Automatically set to the server time upon write.
+    val tags: List<String> = emptyList() // List of tag names.
 )

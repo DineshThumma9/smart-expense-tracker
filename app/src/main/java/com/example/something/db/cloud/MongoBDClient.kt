@@ -1,3 +1,4 @@
+/*
 package com.example.something.db.cloud
 
 import android.util.Log
@@ -39,8 +40,9 @@ object MongoDBClient {
             Log.e(TAG, "MongoDB connection failed", e)
         }
     }
+    */
+/** Test MongoDB connection *//*
 
-    /** Test MongoDB connection */
     suspend fun testConnection() {
         withContext(Dispatchers.IO) {
             try {
@@ -53,3 +55,4 @@ object MongoDBClient {
         }
     }
 }
+*/

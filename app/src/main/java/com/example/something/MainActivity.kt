@@ -11,21 +11,21 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.Crossfade
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
-import com.example.something.db.cloud.PaymentMongoDao
+import com.example.something.db.cloud.PaymentFirestoreDao
 import com.example.something.navigation.AuthNavGraph
-import com.example.something.navigation.MainNavGraph
 import com.example.something.navigation.BottomNavigationBar
+import com.example.something.navigation.MainNavGraph
 import com.example.something.screens.AnalysisScreen
 import com.example.something.screens.AnalysisViewModel
 import com.example.something.ui.theme.SomethingTheme
 import com.example.something.viewmodel.AuthViewModel
 import com.example.something.viewmodel.PaymentViewModel
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
 class MainActivity : ComponentActivity() {
 
@@ -54,21 +54,25 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
 
-        // Initialize your database and DAOs
+        // Initialize your local database (Room) and DAOs
         val database = applicationContext.getDatabase()
-        val paymentMongoDao = PaymentMongoDao()
 
+        // Use the new Firestore DAO which generates document IDs automatically
+        val paymentFirestoreDao = PaymentFirestoreDao()
+
+        // Create the PaymentViewModel with all required DAOs
         val paymentViewModel = PaymentViewModel(
             paymentDao = database.paymentDao(),
             tagDao = database.tagDao(),
             paymentWithTagsDao = database.paymentWithTagsDao(),
             crossRefDao = database.paymentTagsCrossRefDao(),
-            paymentMongodao = paymentMongoDao
+            paymentFirestoreDao = paymentFirestoreDao
         )
 
+        // Create the AnalysisViewModel using the same Firestore DAO
         val analysisViewModel = AnalysisViewModel(
-            paymentMongoDao = PaymentMongoDao(),
-            modifier = Modifier
+            modifier = Modifier,
+            paymentFirestoreDao = paymentFirestoreDao
         )
 
         val authViewModel = AuthViewModel()
@@ -105,16 +109,5 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun AnalysisPreview() {
-    SomethingTheme {
-        AnalysisScreen(
-            navController = rememberNavController(),
-            viewModel = AnalysisViewModel(modifier = Modifier, paymentMongoDao = PaymentMongoDao())
-        )
     }
 }

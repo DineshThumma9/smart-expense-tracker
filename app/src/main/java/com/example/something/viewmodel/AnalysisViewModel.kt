@@ -4,17 +4,16 @@ import android.util.Log
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.something.db.cloud.PaymentMongoDao
+import com.example.something.db.cloud.PaymentFirestoreDao
 import com.example.something.entity.PaymentMongo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import org.bson.Document
 import java.util.Date
 
 class AnalysisViewModel(
     val modifier: Modifier,
-    private val paymentMongoDao: PaymentMongoDao
+    private val paymentFirestoreDao: PaymentFirestoreDao
 ) : ViewModel() {
 
     // State for list of payments
@@ -33,7 +32,7 @@ class AnalysisViewModel(
 
     fun getAllPayments() {
         viewModelScope.launch {
-            paymentMongoDao.getAllPayments().collect { list ->
+            paymentFirestoreDao.getAllPayments().collect { list ->
                 _payments.value = list
             }
         }
@@ -41,7 +40,7 @@ class AnalysisViewModel(
 
     fun getPaymentByName(name: String) {
         viewModelScope.launch {
-            paymentMongoDao.getPaymentByName(name).collect { list ->
+            paymentFirestoreDao.getPaymentByName(name).collect { list ->
                 _payments.value = list
             }
         }
@@ -49,8 +48,8 @@ class AnalysisViewModel(
 
     fun getPaymentAbove(amount: Int) {
         viewModelScope.launch {
-            Log.d("Analysis" , "Calling method")
-            paymentMongoDao.getPaymentAbove(amount).collect { list ->
+            Log.d("AnalysisViewModel", "Calling getPaymentAbove")
+            paymentFirestoreDao.getPaymentAbove(amount).collect { list ->
                 _payments.value = list
             }
         }
@@ -58,7 +57,7 @@ class AnalysisViewModel(
 
     fun getPaymentReceived() {
         viewModelScope.launch {
-            paymentMongoDao.getPaymentReceived().collect { list ->
+            paymentFirestoreDao.getPaymentReceived().collect { list ->
                 _payments.value = list
             }
         }
@@ -66,15 +65,15 @@ class AnalysisViewModel(
 
     fun getPaymentTransferred() {
         viewModelScope.launch {
-            paymentMongoDao.getPaymentTransferred().collect { list ->
+            paymentFirestoreDao.getPaymentTransferred().collect { list ->
                 _payments.value = list
             }
         }
     }
 
-    fun getPaymentByTags(tags: List<String>) {
+    fun getPaymentsByTags(tags: List<String>) {
         viewModelScope.launch {
-            paymentMongoDao.getPaymentByTags(tags).collect { list ->
+            paymentFirestoreDao.getPaymentsByTags(tags).collect { list ->
                 _payments.value = list
             }
         }
@@ -88,7 +87,7 @@ class AnalysisViewModel(
         type: String? = null
     ) {
         viewModelScope.launch {
-            paymentMongoDao.getCustomPayments(name, dateRange, amountRange, tags, type).collect { list ->
+            paymentFirestoreDao.getCustomPayments(name, dateRange, amountRange, tags, type).collect { list ->
                 _payments.value = list
             }
         }
@@ -96,7 +95,7 @@ class AnalysisViewModel(
 
     fun paymentsInDateRange(from: Date, to: Date) {
         viewModelScope.launch {
-            paymentMongoDao.paymentsInDateRange(from, to).collect { list ->
+            paymentFirestoreDao.paymentsInDateRange(from, to).collect { list ->
                 _payments.value = list
             }
         }
@@ -104,7 +103,7 @@ class AnalysisViewModel(
 
     fun paymentsDateAbove(from: Date) {
         viewModelScope.launch {
-            paymentMongoDao.paymentsDateAbove(from).collect { list ->
+            paymentFirestoreDao.paymentsDateAbove(from).collect { list ->
                 _payments.value = list
             }
         }
@@ -112,7 +111,7 @@ class AnalysisViewModel(
 
     fun paymentsByAUser(user: String) {
         viewModelScope.launch {
-            paymentMongoDao.paymentsByAUser(user).collect { list ->
+            paymentFirestoreDao.paymentsByAUser(user).collect { list ->
                 _payments.value = list
             }
         }
@@ -120,8 +119,8 @@ class AnalysisViewModel(
 
     fun paymentsByAmount(min: Int, max: Int) {
         viewModelScope.launch {
-            Log.d("Analysis" , "Calling method")
-            paymentMongoDao.paymentsByAmount(min, max).collect { list ->
+            Log.d("AnalysisViewModel", "Calling paymentsByAmount")
+            paymentFirestoreDao.paymentsByAmount(min, max).collect { list ->
                 _payments.value = list
             }
         }
@@ -129,15 +128,7 @@ class AnalysisViewModel(
 
     fun paymentsByType(type: String) {
         viewModelScope.launch {
-            paymentMongoDao.paymentsByType(type).collect { list ->
-                _payments.value = list
-            }
-        }
-    }
-
-    fun paymentsByTag(tags: List<String>) {
-        viewModelScope.launch {
-            paymentMongoDao.paymentsByTag(tags).collect { list ->
+            paymentFirestoreDao.paymentsByType(type).collect { list ->
                 _payments.value = list
             }
         }
@@ -147,49 +138,55 @@ class AnalysisViewModel(
 
     fun totalSumOfPayments() {
         viewModelScope.launch {
-            val sum = paymentMongoDao.totalSumOfPayments()
+            val sum = paymentFirestoreDao.totalSumOfPayments()
             _totalSum.value = sum
         }
     }
 
     fun totalPayments() {
         viewModelScope.launch {
-            val count = paymentMongoDao.totalPayments()
+            val count = paymentFirestoreDao.totalPayments()
             _totalCount.value = count
         }
     }
 
     fun totalSumOfPaymentsByUser(user: String) {
         viewModelScope.launch {
-            val sum = paymentMongoDao.totalSumOfPaymentsByUser(user)
+            val sum = paymentFirestoreDao.totalSumOfPaymentsByUser(user)
             _totalSum.value = sum
         }
     }
 
     fun totalSumOfPaymentsInDateRange(from: Date, to: Date) {
         viewModelScope.launch {
-            val sum = paymentMongoDao.totalSumOfPaymentsInDateRange(from, to)
+            val sum = paymentFirestoreDao.totalSumOfPaymentsInDateRange(from, to)
             _totalSum.value = sum
         }
     }
 
     fun totalSumOfPaymentsByTags(tags: List<String>) {
         viewModelScope.launch {
-            val sum = paymentMongoDao.totalSumOfPaymentsByTags(tags)
+            val sum = paymentFirestoreDao.totalSumOfPaymentsByTags(tags)
             _totalSum.value = sum
         }
     }
 
     fun totalSumOfPaymentsByTransactionType(type: String) {
         viewModelScope.launch {
-            val sum = paymentMongoDao.totalSumOfPaymentsByTransactionType(type)
+            val sum = paymentFirestoreDao.totalSumOfPaymentsByTransactionType(type)
             _totalSum.value = sum
         }
     }
 
-    fun totalSumOfPaymentsByCustomQuery(query: Document) {
+    fun totalSumOfPaymentsByCustomQuery(
+        name: String? = null,
+        dateRange: Pair<Date, Date>? = null,
+        amountRange: Pair<Int, Int>? = null,
+        tags: List<String>? = null,
+        type: String? = null
+    ) {
         viewModelScope.launch {
-            val sum = paymentMongoDao.totalSumOfPaymentsByCustomQuery(query)
+            val sum = paymentFirestoreDao.totalSumOfPaymentsByCustomQuery(name, dateRange, amountRange, tags, type)
             _totalSum.value = sum
         }
     }

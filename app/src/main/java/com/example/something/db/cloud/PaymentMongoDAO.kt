@@ -1,3 +1,4 @@
+/*
 package com.example.something.db.cloud
 
 import android.util.Log
@@ -199,4 +200,4 @@ class PaymentMongoDao {
         paymentCollection.insertOne(mongoPayment)
         Log.d("PaymentMongoDao", "Payment inserted to MongoDB")
     }
-}
+}*/

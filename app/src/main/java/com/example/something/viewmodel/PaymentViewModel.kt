@@ -4,15 +4,15 @@ import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.example.something.db.cloud.PaymentMongoDao
+import com.example.something.db.cloud.PaymentFirestoreDao
 import com.example.something.db.local.PaymentDao
-import com.example.something.db.local.PaymentWithTagsDao
 import com.example.something.db.local.PaymentTagsCrossRefDao
+import com.example.something.db.local.PaymentWithTagsDao
 import com.example.something.db.local.TagDao
 import com.example.something.entity.Payment
 import com.example.something.entity.PaymentMongo
-import com.example.something.entity.PaymentWithTags
 import com.example.something.entity.PaymentTagsCrossRef
+import com.example.something.entity.PaymentWithTags
 import com.example.something.entity.Tag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -25,10 +25,10 @@ class PaymentViewModel(
     private val tagDao: TagDao,
     private val paymentWithTagsDao: PaymentWithTagsDao,
     private val crossRefDao: PaymentTagsCrossRefDao,
-    private val paymentMongodao: PaymentMongoDao
+    private val paymentFirestoreDao: PaymentFirestoreDao  // Updated to use Firestore DAO
 ) : ViewModel() {
 
-    // Private mutable state for current payment
+    // Private mutable state for current payment balance
     private val _currPayment = mutableStateOf(0.0)
     // Public read-only observable state
     val currPayment: State<Double> get() = _currPayment
@@ -48,16 +48,16 @@ class PaymentViewModel(
             // Update the current payment balance
             _currPayment.value -= amount
 
-            // Insert into MongoDB
-            val mongoPayment = PaymentMongo(
+            // Create a PaymentMongo object to save in Firestore
+            val firestorePayment = PaymentMongo(
                 sender = sender,
-                amount = amount,
+                amount = amount.toDouble(),
                 tags = tags
             )
 
-            Log.d("PaymentViewModel", "Saving payment to MongoDB: $mongoPayment")
-            paymentMongodao.insert(mongoPayment)
-            Log.d("PaymentViewModel", "Payment saved to MongoDB")
+            Log.d("PaymentViewModel", "Saving payment to Firestore: $firestorePayment")
+            paymentFirestoreDao.insert(firestorePayment)
+            Log.d("PaymentViewModel", "Payment saved to Firestore")
 
             // Handle tags in Room
             tags.forEach { tagName ->
@@ -112,9 +112,9 @@ class PaymentViewModel(
         return paymentWithTagsDao.getAllPaymentsWithTagsByTag(tag.tagId)
     }
 
-    // In PaymentViewModel.kt
+    // Update current payment balance from a string value
     fun updateCurrPayment(newAmount: String) {
         _currPayment.value = newAmount.toDouble()
-        // Optionally save this to your database or persistent storage
+        // Optionally, save this to your database or persistent storage
     }
 }

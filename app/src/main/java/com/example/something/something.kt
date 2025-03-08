@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.Context
 import android.util.Log
 import androidx.room.Room
-import com.example.something.db.cloud.MongoDBClient
 import com.example.something.db.local.AppDatabase
 import com.google.firebase.FirebaseApp
 import kotlinx.coroutines.CoroutineScope
@@ -27,15 +26,11 @@ class something : Application() {
         super.onCreate()
         FirebaseApp.initializeApp(this)
 
-
-        // Initialize both databases in background threads
+        // Initialize Room database in a background thread
         applicationScope.launch(Dispatchers.IO) {
             try {
-                // Initialize Room database
                 database.paymentDao()
-
-                // Initialize MongoDB
-                MongoDBClient.database
+                // MongoDB initialization removed since we use Firestore for cloud operations.
             } catch (e: Exception) {
                 Log.e("something", "Error initializing databases", e)
             }
